@@ -2,7 +2,35 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import emailjs from '@emailjs/browser'; 
+import { useRef } from 'react';
+import './img.css';
 const Contact = () => {
+  const inputRef = useRef(null);
+  const [image, setImage] = useState("");
+  const [preview, setPreview] = useState(null);
+
+  const handleImageClick = () => {
+    inputRef.current.click();
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    setImage(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
+  const handleImageResize = () => {
+    const img = document.getElementById("preview-image");
+    if (img) {
+      const width = img.offsetWidth;
+      const height = img.offsetHeight;
+      if (width > 300 || height > 200) {
+        img.style.width = `${width / 2}px`;
+        img.style.height = `${height / 2}px`;
+      }
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -65,108 +93,100 @@ const Contact = () => {
 
 
   return (
-    <div className='ContactForm'>
-      <div className='container'>
-        <div className='row'>
-          <div className='col-12 text-center'>
-            <div className='contactForm'>
-              <form id='contact-form' onSubmit={handleSubmit(onSubmit)} noValidate>
-                {/* Row 1 of form */}
-                <div className='row formRow'>
-                  <div className='col-6'>
-                    <input
-                      type='text'
-                      name='name'
-                      {...register('name', {
-                        required: { value: true, message: 'Please enter your name' },
-                        maxLength: {
-                          value: 30,
-                          message: 'Please use 30 characters or less'
-                        }
-                      })}
-                      className='form-control formInput'
-                      placeholder='Name'
-                    ></input>
-                    {errors.name && <span className='errorMessage'>{errors.name.message}</span>}
-                  </div>
-                  <div className='col-6'>
-                    <input
-                      type='email'
-                      name='email'
-                      {...register('email', {
-                        required: true,
-                        pattern: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-                      })}
-                      className='form-control formInput'
-                      placeholder='Email address'
-                    ></input>
-                    {errors.email && (
-                      <span className='errorMessage'>Please enter a valid email address</span>
-                    )}
-                  </div>
-                </div>
-                {/* Row 2 of form */}
-                <div className='row formRow'>
-                  <div className='col'>
-                    <input
-                      type='text'
-                      name='subject'
-                      {...register('subject', {
-                        required: { value: true, message: 'Please enter a subject' },
-                        maxLength: {
-                          value: 75,
-                          message: 'Subject cannot exceed 75 characters'
-                        }
-                      })}
-                      className='form-control formInput'
-                      placeholder='Subject'
-                    ></input>
-                    {errors.subject && (
-                      <span className='errorMessage'>{errors.subject.message}</span>
-                    )}
-                  </div>
-                </div>
-                {/* Row 3 of form */}
-                <div className='row formRow'>
-                  <div className='col'>
-                    <textarea
-                      rows={3}
-                      name='message'
-                      {...register('message', {
-                        required: true
-                      })}
-                      className='form-control formInput'
-                      placeholder='Message'
-                    ></textarea>
-                    {errors.message && <span className='errorMessage'>Please enter a message</span>}
-                  </div>
-                </div>
-                <button className='submit-btn' type='submit'>
-                  Submit
-                </button>
-              </form>
-            </div>
+    <>
+    <div class="flex items-center justify-center p-12">
+      <div class="mx-auto w-full max-w-[550px]">
+        <form  method="POST">
+        <div className='img'>
+<div onClick={handleImageClick}>
+    {preview ? (
+      <img
+        id="preview-image"
+        src={preview}
+        alt="my image"
+        className="profile-image"
+        style={{
+          width: "10%",
+          height: "10%",
+          objectFit: "cover",
+          borderRadius: "50%",
+        }}
+      />
+    ) : (
+      <img src="../upload.jpg" alt="my image" style={{width:'100px'}} />
+    )}
+    <input type="file" ref={inputRef} onChange={handleImageChange} style={{ display: "none" }} />
+    <button 
+className="img-upload" 
+style={{ 
+backgroundColor: '#808080', 
+width: '150px' ,
+height: '40px'
+}} 
+onClick={handleImageResize}>
+upload
+</button>
+  </div>
+</div>
+     <div class="mb-5">
+            <label
+              for="name"
+              class="mb-3 block text-base font-medium text-[#07074D]"
+            >
+              Full Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              placeholder="Full Name"
+              class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+            />
           </div>
-        </div>
+          <div class="mb-5">
+            <label
+              for="email"
+              class="mb-3 block text-base font-medium text-[#07074D]"
+            >
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              placeholder="example@domain.com"
+              class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+            />
+          </div>
+        
+          <div class="mb-5">
+            <label
+              for="message"
+              class="mb-3 block text-base font-medium text-[#07074D]"
+            >
+              Message
+            </label>
+            <textarea
+              rows="4"
+              name="message"
+              id="message"
+              placeholder="Type your message"
+              class="w-full resize-none rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+            ></textarea>
+          </div>
+          <div>
+          <button
+  class="hover:shadow-form rounded-md bg-[#6A64F1] py-3 px-8 text-base font-semibold text-white outline-none"
+  style={{ marginBottom: "380px" }}
+>
+  Submit
+</button>
+          </div>
+        </form>
       </div>
-        {alertInfo.display && (
-          <div
-            className={`alert alert-${alertInfo.type} alert-dismissible mt-5`}
-            role='alert'
-          >
-            {alertInfo.message}
-            <button
-              type='button'
-              className='btn-close'
-              data-bs-dismiss='alert'
-              aria-label='Close'
-              onClick={() =>
-                setAlertInfo({ display: false, message: '', type: '' })
-              } // Clear the alert when close button is clicked
-            ></button>
-          </div>
-        )}
     </div>
-  );
+
+</>
+  )
 };
 export default Contact;
