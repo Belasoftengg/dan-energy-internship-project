@@ -1,201 +1,93 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { useState } from 'react';
-import emailjs from '@emailjs/browser'; 
-import { useRef } from 'react';
-import './img.css';
+import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { useHistory } from 'react-router-dom';
+import {
+  MDBBtn,
+  MDBContainer,
+  MDBRow,
+  MDBCol,
+  MDBCard,
+  MDBCardBody,
+  MDBCardImage,
+  MDBInput,
+  MDBIcon,
+
+}
+from 'mdb-react-ui-kit';
+
 const Contact = () => {
-  const inputRef = useRef(null);
-  const [image, setImage] = useState("");
-  const [preview, setPreview] = useState(null);
+  const history = useHistory();
+  const [name, setName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState(null);
 
-  const handleImageClick = () => {
-    inputRef.current.click();
-  };
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    setImage(file);
-    setPreview(URL.createObjectURL(file));
-  };
-
-  const handleImageResize = () => {
-    const img = document.getElementById("preview-image");
-    if (img) {
-      const width = img.offsetWidth;
-      const height = img.offsetHeight;
-      if (width > 300 || height > 200) {
-        img.style.width = `${width / 2}px`;
-        img.style.height = `${height / 2}px`;
-      }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name || !phoneNumber || !subject || !message) {
+      setError('Please fill in all fields');
+      return;
     }
   };
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm();
-  const [disabled, setDisabled] = useState(false);
-  const [alertInfo, setAlertInfo] = useState({
-    display: false,
-    message: '',
-    type: '',
-  });
-  
-  
-  // Shows alert message for form submission feedback
-  const toggleAlert = (message, type) => {
-    setAlertInfo({ display: true, message, type });
-
-    // Hide alert after 5 seconds
-    setTimeout(() => {
-      setAlertInfo({ display: false, message: '', type: '' });
-    }, 5000);
-  };
-  
- // Function called on submit that uses emailjs to send email of valid contact form
- const onSubmit = async (data) => {
-  // Destructure data object
-  const { name, email, subject, message } = data;
-  try {
-    // Disable form while processing submission
-    setDisabled(true);
-    
-    const templateParams = {
-      name,
-      email,
-      subject,
-      message
-    };
-
-    await emailjs.send(
-      process.env.REACT_APP_SERVICE_ID,
-      process.env.REACT_APP_TEMPLATE_ID,
-      templateParams,
-      process.env.REACT_APP_USER_ID
-    );
-
-    // Display success alert
-    toggleAlert('Form submission was successful!', 'success');
-  } catch (e) {
-    console.error(e);
-    // Display error alert
-    toggleAlert('Uh oh. Something went wrong.', 'danger');
-  } finally {
-    // Re-enable form submission
-    setDisabled(false);
-    // Reset contact form fields after submission
-    reset();
-  }
-};
-
-
   return (
-    <>
-    <div class="flex items-center justify-center p-12">
-      <div class="mx-auto w-full max-w-[550px]">
-        <form  method="POST">
-        <div className='img'>
-<div onClick={handleImageClick}>
-    {preview ? (
-      <img
-        id="preview-image"
-        src={preview}
-        alt="my image"
-        className="profile-image"
-        style={{
-          width: "10%",
-          height: "10%",
-          objectFit: "cover",
-          borderRadius: "50%",
-        }}
-      />
-    ) : (
-      <img src="../upload.jpg" alt="my image" style={{width:'100px'}} />
-    )}
-    <input type="file" ref={inputRef} onChange={handleImageChange} style={{ display: "none" }} />
-    <button 
-className="img-upload" 
-style={{ 
-backgroundColor: '#808080', 
-width: '150px' ,
-height: '40px'
-}} 
-onClick={handleImageResize}>
-upload
-</button>
-  </div>
+    <MDBContainer fluid className='pt-5'>
+      <MDBCard className='text-black m-5' style={{ borderRadius: '25px' }}>
+        <MDBCardBody>
+          <MDBRow>
+            <MDBCol md='10' lg='6' className='order-2 order-lg-1 d-flex flex-column align-items-center'>
+              <h1 className="text-center h1 fw-bold mb-4 mx-1 mx-md-4 mt-2"> Contact us </h1>
+              <div className="error-message" style={{ color: 'red' }}>
+                {error && <p>{error}</p>}
+              </div>
+              <form >
+              <div className="d-flex flex-row align-items-center mb-3">
+  <MDBIcon fas icon="user me-3" size='lg'/>
+  <MDBInput  id='form1' type='text' placeholder='name' value={name} onChange={(e) => { setName(e.target.value) }} />
 </div>
-     <div class="mb-5">
-            <label
-              for="name"
-              class="mb-3 block text-base font-medium text-[#07074D]"
-            >
-              Full Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              placeholder="Full Name"
-              class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-            />
-          </div>
-          <div class="mb-5">
-            <label
-              for="email"
-              class="mb-3 block text-base font-medium text-[#07074D]"
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              placeholder="example@domain.com"
-              class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-            />
-          </div>
-        
-          <div class="mb-5">
-            <label
-              for="message"
-              class="mb-3 block text-base font-medium text-[#07074D]"
-            >
-              Message
-            </label>
-            <textarea
-              rows="4"
-              name="message"
-              id="message"
-              placeholder="Type your message"
-              class="w-full resize-none rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-            ></textarea>
-          </div>
-          <div>
-          <button
-  class="hover:shadow-form rounded-md bg-[#6A64F1] py-3 px-8 text-base font-semibold text-white outline-none"
-  style={{ marginBottom: "380px" }}
->
-  Submit
-</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-</>
 
 
 
+<div className="d-flex flex-row align-items-center mb-3">
+  <MDBIcon fas icon="phone" size='lg'/>
+  <MDBInput  id='form2' type='tel' placeholder=' phone number' value={phoneNumber} onChange={(e) => { setPhoneNumber(e.target.value) }} />
+</div>
 
 
 
+<div className="d-flex flex-row align-items-center mb-3">
+  <MDBIcon fas icon="book" size='lg'/>
+  <MDBInput id='form3' type='text' placeholder='subject' value={subject} onChange={(e) => { setSubject(e.target.value) }} />
+</div>
 
+<div className="d-flex flex-row align-items-center mb-3">
+  <MDBIcon fas icon="message" className="me-3" size='lg'/>
+  <textarea
+    id="form4"
+    className="form-control"
+    placeholder=" message "
+    value={message}
+    onChange={(e) => {
+      setMessage(e.target.value);
+    }}
+  />
+</div>
+                <MDBBtn className='mb-3' size='lg' type="submit">Send</MDBBtn>
 
+              </form>
+            </MDBCol>
 
-  )
+           <MDBCol md='10' lg='6' className='order-1 order-lg-2 d-flex align-items-center'>
+  <MDBCardImage src='images/customer/contact.jpg' alt='FAILED TO INSERT THE IMAGE'fluid/>
+</MDBCol>
+
+          </MDBRow>
+        </MDBCardBody>
+      </MDBCard>
+
+    </MDBContainer>
+  );
 };
+
 export default Contact;
